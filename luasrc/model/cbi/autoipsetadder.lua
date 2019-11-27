@@ -5,7 +5,7 @@ local uci=require"luci.model.uci".cursor()
 
 mp = Map("autoipsetadder", translate("ipsetautoadder"))
 mp.description = translate("自动将国外联不通的域名加入ipset")
-mp:section(SimpleSection).template  = "autoipsetadder/autoipsetadder_status"
+mp:section(SimpleSection).template  = "autoipsetadder/status"
 
 s = mp:section(TypedSection, "autoipsetadder")
 s.anonymous=true
@@ -15,9 +15,9 @@ o = s:option(Flag, "enabled", translate("启用"))
 o.default = 0
 o.rmempty = false
 ---- log1
-o=s:option(TextValue, "show", "日志", "description")
+o=s:option(TextValue, "show", "日志")
 o.rmempty=true
-o.rows=20
+o.rows=10
 o.readonly="readonly"
 function o.cfgvalue()
      logfile="/tmp/addlist.log"

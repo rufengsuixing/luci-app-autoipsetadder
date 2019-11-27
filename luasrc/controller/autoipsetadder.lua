@@ -2,12 +2,11 @@ module("luci.controller.autoipsetadder",package.seeall)
 io     = require "io"
 fs=require"nixio.fs"
 function index()
-end
 	entry({"admin","services","autoipsetadder"},firstchild(),_("autoipsetadder"),30).dependent=true
-	entry({"admin","services","autoipsetadder","general"},cbi("autoipsetadder"),_("Base Setting"),1)
+	entry({"admin","services","autoipsetadder","autoipsetadder"},cbi("autoipsetadder"),_("Base Setting"),1)
     entry({"admin","services","autoipsetadder","status"},call("act_status")).leaf=true
 	entry({"admin", "services", "autoipsetadder", "check"}, call("check_update"))
-	entry({"admin", "services", "autoipsetadder", "doupdate"}, call("dodebug"))
+	entry({"admin", "services", "autoipsetadder", "dodebug"}, call("do_debug"))
 end
 
 function act_status()
@@ -16,16 +15,21 @@ function act_status()
   luci.http.prepare_content("application/json")
   luci.http.write_json(e)
 end
-function do_update()
+function do_debug()
 nixio.fs.writefile("/var/run/lucilogpos_ipset","0")
 nixio.fs.writefile("/tmp/debugip","")
-luci.sys.exec("(touch /var/run/debugipset ; /usr/bin/debugip.sh</tmp/debugip & ;rm /var/run/debugipset) &")
+luci.sys.exec("(touch /var/run/debugipset ; /usr/bin/debugip.sh>/tmp/debugip & ;rm /var/run/debugipset) &")
 luci.http.prepare_content("application/json")
 luci.http.write('')
 end
 function check_update()
 	luci.http.prepare_content("text/plain; charset=utf-8")
-	fdp=tonumber(nixio.fs.readfile("/var/run/debugipset"))
+	logpos=nixio.fs.readfile("/var/run/debugipset")
+	if (logpos ~= nil) then
+	fdp=tonumber(logpos)
+	else
+	fdp=0
+	end
 	f=io.open("/tmp/debugip", "r+")
 	f:seek("set",fdp)
 	a=f:read(8192)

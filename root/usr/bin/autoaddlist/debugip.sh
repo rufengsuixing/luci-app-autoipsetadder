@@ -5,6 +5,7 @@ if (index($0,".")==0)
 {
     next;
 }
+if ($0=="127.0.0.1") {system("ipset d gfwlist 127.0.0.1");next;}
 "ipset test whitelist "$0" 2>&1"| getline ipset;
 close("ipset test whitelist "$0" 2>&1");
     if (index(ipset,"Warning")==0){

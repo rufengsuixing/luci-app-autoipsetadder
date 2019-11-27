@@ -7,10 +7,7 @@ STOP=01
 
 CONFIGURATION=autoipsetadder
 config_get configpath $CONFIGURATION configpath "/etc/AdGuardHome.yaml"
-AdGuardHome_PORT=$(awk '/  port:/{printf($2)}' $configpath)
-if [ -z "$AdGuardHome_PORT" ]; then
-	AdGuardHome_PORT="0"
-fi
+
 set_dnsmasq_log()
 {
 	sed -i '/log-facility/d' /etc/dnsmasq.conf

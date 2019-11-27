@@ -1,7 +1,7 @@
 #!/bin/sh
 stdbuf -oL tail -F /tmp/dnsmasq.log | awk  -F "[, ]+" '/reply/{
 ip=$8;
-if (ip=="")
+if (ip=="" || ip=="127.0.0.1"|| ip=="0.0.0.0")
 {
 next;
 }
