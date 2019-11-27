@@ -37,16 +37,16 @@ start_service() {
 	local enabled
 	config_get_bool enabled $CONFIGURATION enabled 0
 	if [ "$enabled" == "1" ]; then
-		sed -i '/qingkong/d' /etc/contabs/root
-		echo '0 * * * * echo "qingkong" > /tmp/dnsmasq.log' >/etc/contabs/root
-		echo '0 0 * * * echo "qingkong" > /tmp/addlist.log' >/etc/contabs/root
-		set_dnsmasq_log()
+		sed -i '/qingkong/d' /etc/crontabs/root
+		echo '0 * * * * echo "qingkong" > /tmp/dnsmasq.log' >>/etc/crontabs/root
+		echo '0 0 * * * echo "qingkong" > /tmp/addlist.log' >>/etc/crontabs/root
+		set_dnsmasq_log
 		procd_open_instance
 		procd_set_param respawn
 		# pass config to script on start
-		procd_set_param command /usr/bin/autoaddlist/autoaddlist.sh >> /tmp/addlist.log
+		procd_set_param command sh /usr/bin/autoipsetadder/autoaddlist.sh
 		procd_close_instance
-		echo "autoaddlist turn on"
+		echo "autoipsetadder turn on"
 		echo "enabled="$enabled""
 	fi
 }
@@ -54,7 +54,7 @@ start_service() {
 stop_service()
 {	
 	stop_dnsmasq_log
-	sed -i '/qingkong/d' /etc/contabs/root
+	sed -i '/qingkong/d' /etc/crontabs/root
 	config_load "${CONFIGURATION}"
 	killall -q tail
 	killall -q awk

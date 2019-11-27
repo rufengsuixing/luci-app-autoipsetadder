@@ -5,8 +5,9 @@ function index()
 	entry({"admin","services","autoipsetadder"},firstchild(),_("autoipsetadder"),30).dependent=true
 	entry({"admin","services","autoipsetadder","autoipsetadder"},cbi("autoipsetadder"),_("Base Setting"),1)
     entry({"admin","services","autoipsetadder","status"},call("act_status")).leaf=true
-	entry({"admin", "services", "autoipsetadder", "check"}, call("check_update"))
-	entry({"admin", "services", "autoipsetadder", "dodebug"}, call("do_debug"))
+	entry({"admin", "services", "autoipsetadder", "getlog"}, call("get_log"))
+	entry({"admin", "services", "autoipsetadder", "dodellog"}, call("do_del_log"))
+	entry({"admin", "services", "autoipsetadder", "debugip"}, call("do_debug_ip"))
 end
 
 function act_status()
@@ -15,22 +16,29 @@ function act_status()
   luci.http.prepare_content("application/json")
   luci.http.write_json(e)
 end
-function do_debug()
-nixio.fs.writefile("/var/run/lucilogpos_ipset","0")
-nixio.fs.writefile("/tmp/debugip","")
-luci.sys.exec("(touch /var/run/debugipset ; /usr/bin/debugip.sh>/tmp/debugip & ;rm /var/run/debugipset) &")
+function do_del_log()
+nixio.fs.remove("/tmp/addlist.log")
 luci.http.prepare_content("application/json")
 luci.http.write('')
 end
-function check_update()
+function do_debug_ip()
+luci.http.prepare_content("text/plain; charset=utf-8")
+a=luci.sys.exec("/usr/bin/autoipsetadder/debugip.sh")
+if (a=="") then
+a="noproblem"
+end
+luci.http.write(a)
+end
+
+function get_log()
 	luci.http.prepare_content("text/plain; charset=utf-8")
-	logpos=nixio.fs.readfile("/var/run/debugipset")
+	logpos=nixio.fs.readfile("/var/run/lucilogpos_ipset")
 	if (logpos ~= nil) then
 	fdp=tonumber(logpos)
 	else
 	fdp=0
 	end
-	f=io.open("/tmp/debugip", "r+")
+	f=io.open("/tmp/addlist.log", "r+")
 	f:seek("set",fdp)
 	a=f:read(8192)
 	if (a==nil) then
@@ -39,9 +47,5 @@ function check_update()
 	fdp=f:seek()
 	nixio.fs.writefile("/var/run/lucilogpos_ipset",tostring(fdp))
 	f:close()
-	if nixio.fs.access("/var/run/debugipset") then
-		luci.http.write(a)
-	else
-		luci.http.write(a.."\0")
-	end
+	luci.http.write(a)
 end

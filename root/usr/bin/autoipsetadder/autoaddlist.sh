@@ -1,4 +1,5 @@
 #!/bin/sh
+PATH="/usr/sbin:/usr/bin:/sbin:/bin"
 stdbuf -oL tail -F /tmp/dnsmasq.log | awk  -F "[, ]+" '/reply/{
 ip=$8;
 if (ip=="" || ip=="127.0.0.1"|| ip=="0.0.0.0")
@@ -58,7 +59,7 @@ if (index(ipset,"Warning")!=0){
 "ipset test gfwlist "ip" 2>&1"| getline ipset;
 close("ipset test gfwlist "ip" 2>&1");
 if (index(ipset,"Warning")!=0){
-	print("china "ip" pass");
+	print("gfwlist "ip" pass");
 	next;
     }
 
@@ -115,7 +116,7 @@ if (tryhttps==1)
         print(ip" "domain" 443"ipcount-1);
         a[ip]=domain;
         #正在使用的ip用最大延迟，最后探测，减少打断tcp的可能
-        system("/usr/bin/autoaddlist/testip.sh "ip" "domain" 443 "ipcount-1" &");
+        system("/usr/bin/autoipsetadder/testip.sh "ip" "domain" 443 "ipcount-1" &");
         delete ipcache[ipcount];
         createpid=0;
     }
@@ -123,7 +124,7 @@ if (tryhttps==1)
     for (ipindex in ipcache){
         print(ipcache[ipindex]" "domain" 443 "ipindex-1);
         a[ipcache[ipindex]]=domain;
-        system("/usr/bin/autoaddlist/testip.sh "ipcache[ipindex]" "domain" 443 "ipindex-1" &");
+        system("/usr/bin/autoipsetadder/testip.sh "ipcache[ipindex]" "domain" 443 "ipindex-1" &");
         delete ipcache[ipindex];
     }
     #后续同域名ip免nf_conntrack测试
@@ -138,16 +139,16 @@ else if (tryhttp==1)
         print("create"domain);
         print(ip" "domain" 80 "ipcount-1);
         a[ip]=domain;
-        system("/usr/bin/autoaddlist/testip.sh "ip" "domain" 80 "ipcount-1" &");
+        system("/usr/bin/autoipsetadder/testip.sh "ip" "domain" 80 "ipcount-1" &");
         delete ipcache[ipcount];
         createpid=0;
     }
     for (ipindex in ipcache){
         print(ipcache[ipindex]" "domain" 80 "ipindex-1);
         a[ipcache[ipindex]]=domain;
-        system("/usr/bin/autoaddlist/testip.sh "ipcache[ipindex]" "domain" 80 "ipindex-1" &");
+        system("/usr/bin/autoipsetadder/testip.sh "ipcache[ipindex]" "domain" 80 "ipindex-1" &");
         delete ipcache[ipindex];
     }
     testall=80;
 }}
-}'
+}'  >> /tmp/addlist.log

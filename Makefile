@@ -33,7 +33,6 @@ define Build/Compile
 endef
 
 define Package/luci-app-autoipsetadder/conffiles
-/etc/autoipsetadder.yaml
 /etc/config/autoipsetadder
 endef
 

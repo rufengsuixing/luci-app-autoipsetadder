@@ -2,34 +2,41 @@
 <%uci=require"luci.model.uci".cursor()%>
 <%nixio=require"nixio"%>
 
-<input class="cbi-button cbi-button-apply" name="apply_update_button" id="apply_update_button" value="debug" onclick=" return apply_debug_ipset() "/>
-		<textarea id="cbid.logview.1.conf" class="cbi-input-textarea" style="width: 100%;display:none" data-update="change" name="vbid.logview.1.conf" rows="5" cols="60" readonly="readonly" > </textarea>
+<%if uci:get("autoipsetadder","autoipsetadder","enabled") then%>
+<textarea id="cbid.logview.1.conf" class="cbi-input-textarea" style="width: 100%;display:inline" data-update="change" name="vbid.logview.1.conf" rows="5" cols="60" readonly="readonly" > </textarea>
+<input class="cbi-button cbi-button-apply" name="apply_update_button" id="apply_update_button" value="dellog" onclick=" return apply_del_log() "/>
+
+<input class="cbi-button cbi-button-apply" name="apply_update_button" id="apply_update_button" value="debug" onclick=" return debug_ip() "/>
+
+<textarea id="cbid.logview.2.conf" class="cbi-input-textarea" style="width: 100%;display:none" data-update="change" name="vbid.logview.1.conf" rows="5" cols="60" readonly="readonly" > </textarea>
+
 <script type="text/javascript">//<![CDATA[
-function apply_debug_ipset(){
-	XHR.get('<%=url([[admin]], [[services]], [[autoipsetadder]], [[dodebug]])%>',null,function(x, data){}
+function apply_del_log(){
+	XHR.get('<%=url([[admin]], [[services]], [[autoipsetadder]], [[dodellog]])%>',null,function(x, data){}
 		);
-	poll_check();
+	return
+}
+function debug_ip(){
+	var lv2 = document.getElementById('cbid.logview.2.conf');
+	lv2.style.display="inline"
+	XHR.get('<%=url([[admin]], [[services]], [[autoipsetadder]], [[debugip]])%>',null,function(x, data){
+	var lv2 = document.getElementById('cbid.logview.2.conf');
+	lv2.innerHTML = x.responseText; 
+	}
+		);
 	return
 }
 function poll_check(){
-var	btn = document.getElementById('apply_update_button');
-	btn.disabled = true;
-	btn.value    = '<%:Check...%>';
-var lv = document.getElementById('cbid.logview.1.conf');
-	lv.style.display="inline"
-XHR.poll(3, '<%=url([[admin]], [[services]], [[autoipsetadder]], [[check]])%>', null,
+XHR.poll(3, '<%=url([[admin]], [[services]], [[autoipsetadder]], [[getlog]])%>', null,
 	function(x, data) {
 		var lv = document.getElementById('cbid.logview.1.conf');
 		if (x.responseText && lv) {
 			if (x.responseText=="\u0000")
 			{
 				for(j = 0,len=this.XHR._q.length; j < len; j++) {
-				if (this.XHR._q[j].url == '<%=url([[admin]], [[services]], [[autoipsetadder]], [[check]])%>')
+				if (this.XHR._q[j].url == '<%=url([[admin]], [[services]], [[autoipsetadder]], [[getlog]])%>')
 				{
 				this.XHR._q.splice(j,1);
-				btn.disabled = false;
-				btn.value    = '完成';
-				document.getElementById('updateversion').innerText="<%=uci:get("autoipsetadder","autoipsetadder","version")%>"
 				}
 				}
 				return	
@@ -38,11 +45,7 @@ XHR.poll(3, '<%=url([[admin]], [[services]], [[autoipsetadder]], [[check]])%>', 
 		}
 	}
 );}
-<% if nixio.fs.access("/var/run/debugipset")then %>
 poll_check();
-<%else%>
-var	btn = document.getElementById('apply_update_button');
-	btn.value    = 'debug';
 <%end%>
 //]]>
 </script>
