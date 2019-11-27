@@ -1,4 +1,5 @@
 #!/bin/sh
+PATH="/usr/sbin:/usr/bin:/sbin:/bin"
 dlchina=$1;
 ipset list gfwlist | awk -v dlchina="$dlchina" '{
 if (index($0,".")==0)
