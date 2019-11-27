@@ -1,0 +1,66 @@
+#!/bin/sh /etc/rc.common
+ 
+USE_PROCD=1
+ 
+START=99
+STOP=01
+
+CONFIGURATION=autoipsetadder
+config_get configpath $CONFIGURATION configpath "/etc/AdGuardHome.yaml"
+AdGuardHome_PORT=$(awk '/  port:/{printf($2)}' $configpath)
+if [ -z "$AdGuardHome_PORT" ]; then
+	AdGuardHome_PORT="0"
+fi
+set_dnsmasq_log()
+{
+	sed -i '/log-facility/d' /etc/dnsmasq.conf
+	sed -i '/log-queries/d' /etc/dnsmasq.conf
+	uci set dhcp.@dnsmasq[0].logfacility='/tmp/dnsmasq.log'
+	uci delete dhcp.@dnsmasq[0].logqueries
+	echo log-queries >> /etc/dnsmasq.conf
+	uci commit dhcp
+}
+
+stop_dnsmasq_log()
+{
+	sed -i '/log-queries/d' /etc/dnsmasq.conf
+	uci delete dhcp.@dnsmasq[0].logfacility
+	uci commit dhcp
+}
+
+reload_service()
+{
+	stop
+	start
+}
+
+start_service() {
+	# Reading config
+	config_load "${CONFIGURATION}"
+	local enabled
+	config_get_bool enabled $CONFIGURATION enabled 0
+	if [ "$enabled" == "1" ]; then
+		sed -i '/qingkong/d' /etc/contabs/root
+		echo '0 * * * * echo "qingkong" > /tmp/dnsmasq.log' >/etc/contabs/root
+		echo '0 0 * * * echo "qingkong" > /tmp/addlist.log' >/etc/contabs/root
+		set_dnsmasq_log()
+		procd_open_instance
+		procd_set_param respawn
+		# pass config to script on start
+		procd_set_param command /usr/bin/autoaddlist/autoaddlist.sh >> /tmp/addlist.log
+		procd_close_instance
+		echo "autoaddlist turn on"
+		echo "enabled="$enabled""
+	fi
+}
+
+stop_service()
+{	
+	stop_dnsmasq_log
+	sed -i '/qingkong/d' /etc/contabs/root
+	config_load "${CONFIGURATION}"
+	killall -q tail
+	killall -q awk
+	echo "AdGuardHome turn off"
+	echo "enabled="$enabled""
+}
