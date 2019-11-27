@@ -6,8 +6,6 @@ START=99
 STOP=01
 
 CONFIGURATION=autoipsetadder
-config_get configpath $CONFIGURATION configpath "/etc/AdGuardHome.yaml"
-
 set_dnsmasq_log()
 {
 	sed -i '/log-facility/d' /etc/dnsmasq.conf
@@ -58,6 +56,6 @@ stop_service()
 	config_load "${CONFIGURATION}"
 	killall -q tail
 	killall -q awk
-	echo "AdGuardHome turn off"
+	echo "autoipsetadder turn off"
 	echo "enabled="$enabled""
 }

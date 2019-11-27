@@ -17,6 +17,8 @@ o.rmempty = false
 ---- log1
 o=s:option(TextValue, "show", "日志")
 o.template = "autoipsetadder/check"
+---- apply
+local apply = luci.http.formvalue("cbi.apply")
 if apply then
      io.popen("/etc/init.d/autoipsetadder reload &")
 end
