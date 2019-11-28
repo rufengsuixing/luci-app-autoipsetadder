@@ -12,7 +12,10 @@
 
 <script type="text/javascript">//<![CDATA[
 function apply_del_log(){
-	XHR.get('<%=url([[admin]], [[services]], [[autoipsetadder]], [[dodellog]])%>',null,function(x, data){}
+	XHR.get('<%=url([[admin]], [[services]], [[autoipsetadder]], [[dodellog]])%>',null,function(x, data){
+	var lv = document.getElementById('cbid.logview.1.conf');
+		lv.innerHTML="";
+	}
 		);
 	return
 }
