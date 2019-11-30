@@ -18,7 +18,7 @@ function act_status()
   luci.http.write_json(e)
 end
 function do_del_log()
-nixio.fs.remove("/tmp/addlist.log")
+nixio.fs.writefile("/tmp/addlist.log","")
 luci.http.prepare_content("application/json")
 luci.http.write('')
 end
