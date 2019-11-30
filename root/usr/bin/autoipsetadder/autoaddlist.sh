@@ -50,6 +50,7 @@ if (passdomain==domain)
     a[ip]=domain;
     next;
 }
+ipcache[ipcount]=ip;
 "ipset test china "ip" 2>&1"| getline ipset;
 close("ipset test china "ip" 2>&1");
 if (index(ipset,"Warning")!=0){
@@ -64,7 +65,6 @@ if (index(ipset,"Warning")!=0){
     }
 
 #ip压入缓存，用于未检测到443/80的缓存
-ipcache[ipcount]=ip;
 if (testall==0){
     tryhttps=0;
     tryhttp=0;
