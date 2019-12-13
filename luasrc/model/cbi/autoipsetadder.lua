@@ -19,10 +19,5 @@ o=s:option(TextValue, "show", "日志")
 o.template = "autoipsetadder/check"
 ---- apply
 nixio.fs.writefile("/var/run/lucilogpos_ipset","0")
-local apply = luci.http.formvalue("cbi.apply")
-if apply then
-     io.popen("/etc/init.d/autoipsetadder reload &")
-end
-
 
 return mp
