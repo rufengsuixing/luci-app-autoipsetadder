@@ -7,8 +7,9 @@ wait=0;
 {wait=$4;}
 system("sleep "wait);
 ERRNO="";
-getline drop< "/tmp/run/"$2;
-close("/tmp/run/"$2);
+pidfile="/tmp/run/autoipsetadder/"$2
+getline drop< pidfile;
+close(pidfile);
 if (ERRNO) {
 addlist=0;
 print("bypass"$1" "$2);
@@ -105,8 +106,8 @@ if (addlist!=1)
 }
 ERRNO="";
 if (pingloss!=1){
-    getline drop< "/tmp/run/"$2;
-    close("/tmp/run/"$2);
+    getline drop< pidfile;
+    close(pidfile);
 }
 if (ERRNO) {addlist=0;next;}
 if (addlist==1){
@@ -148,36 +149,36 @@ if (addlist==1){
 if (addlist==2)
 {   if (pingloss==0){
     ERRNO="";
-    getline drop< "/tmp/run/"$2;
+    getline drop< pidfile;
     if (ERRNO) {
         system("ipset del gfwlist "$1);
         print("cancel add myself "$1" "$2" due to one ip success direct");
     }else{
-    print $1"\n">>"/tmp/run/"$2;
+    print $1"\n">>pidfile;
     }
-    close("/tmp/run/"$2);}
+    close(pidfile);}
 }else if (addlist==-1)
 {
     print($1" "$2" direct success");
-    while ((getline ret< "/tmp/run/"$2) > 0)
+    while ((getline ret< pidfile) > 0)
     {
         if (ret!=""){
         system("ipset del gfwlist "ret);
         print("cancel add someone "ret" "$2" due to me"$1" success direct");
         }
     }
-    close("/tmp/run/"$2);
-    system("rm /tmp/run/"$2" 2>/dev/null");
+    close(pidfile);
+    system("rm "pidfile" 2>/dev/null");
     print($1" del "$2);
 }else if (addlist==-2)
 {   
     system("sleep 10");
-    while ((getline ret< "/tmp/run/"$2) > 0)
+    while ((getline ret< pidfile) > 0)
     {
         if (ret!=""){
         system("ipset add gfwlist "$1);
         print("add "ret" "$2" due to one ip success proxy");
         break;}
     }
-    close("/tmp/run/"$2);
+    close(pidfile);
 }}'

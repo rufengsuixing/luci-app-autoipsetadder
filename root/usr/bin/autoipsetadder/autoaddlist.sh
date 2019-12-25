@@ -1,5 +1,7 @@
 #!/bin/sh
 PATH="/usr/sbin:/usr/bin:/sbin:/bin"
+logfile=$(uci get autoipsetadder.autoipsetadder.logfile)
+[ -z "$logfile" ] && logfile="/tmp/addlist.log"
 stdbuf -oL tail -F /tmp/dnsmasq.log | awk  -F "[, ]+" '/reply/{
 ip=$8;
 if (ip=="" || ip=="127.0.0.1"|| ip=="0.0.0.0")
@@ -110,8 +112,8 @@ if (testall==0){
 if (tryhttps==1)
 {   if (createpid==1)
     {
-        print "">"/tmp/run/"domain
-        close("/tmp/run/"domain);
+        print "">"/tmp/run/autoipsetadder/"domain
+        close("/tmp/run/autoipsetadder/"domain);
         print("create"domain);
         print(ip" "domain" 443"ipcount-1);
         a[ip]=domain;
@@ -134,8 +136,8 @@ else if (tryhttp==1)
 {   
     if (createpid==1)
     {
-        print "">"/tmp/run/"domain
-        close("/tmp/run/"domain);
+        print "">"/tmp/run/autoipsetadder/"domain
+        close("/tmp/run/autoipsetadder/"domain);
         print("create"domain);
         print(ip" "domain" 80 "ipcount-1);
         a[ip]=domain;
@@ -151,4 +153,4 @@ else if (tryhttp==1)
     }
     testall=80;
 }}
-}'  >> /tmp/addlist.log
+}'  >> $logfile
