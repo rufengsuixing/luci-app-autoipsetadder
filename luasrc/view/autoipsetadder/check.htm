@@ -2,8 +2,9 @@
 <%uci=require"luci.model.uci".cursor()%>
 <%nixio=require"nixio"%>
 
-<%if uci:get("autoipsetadder","autoipsetadder","enabled") then%>
+<%if uci:get("autoipsetadder","autoipsetadder","enabled")=="1" then%>
 <textarea id="cbid.logview.1.conf" class="cbi-input-textarea" style="width: 100%;display:inline" data-update="change" name="vbid.logview.1.conf" rows="10" cols="60" readonly="readonly" > </textarea>
+<input type="checkbox" name="NAME" value="reverse" onclick=" return reverselog()" style="vertical-align:middle;height: auto;" checked><%:reverse%></input>
 <input class="cbi-button cbi-button-apply" name="apply_update_button" id="apply_update_button" value="dellog" onclick=" return apply_del_log() "/>
 
 <input class="cbi-button cbi-button-apply" name="apply_update_button" id="apply_update_button" value="debug" onclick=" return debug_ip() "/>
@@ -11,12 +12,23 @@
 <textarea id="cbid.logview.2.conf" class="cbi-input-textarea" style="width: 100%;display:none" data-update="change" name="vbid.logview.1.conf" rows="10" cols="60" readonly="readonly" > </textarea>
 
 <script type="text/javascript">//<![CDATA[
+var islogreverse = true;
 function apply_del_log(){
 	XHR.get('<%=url([[admin]], [[services]], [[autoipsetadder]], [[dodellog]])%>',null,function(x, data){
 	var lv = document.getElementById('cbid.logview.1.conf');
 		lv.innerHTML="";
 	}
 		);
+	return
+}
+function reverselog(){
+	var lv = document.getElementById('cbid.logview.1.conf');
+	lv.innerHTML=lv.innerHTML.split('\n').reverse().join('\n')
+	if (islogreverse){
+	islogreverse=false;
+	}else{
+	islogreverse=true;
+	}
 	return
 }
 function debug_ip(){
@@ -34,13 +46,17 @@ XHR.poll(3, '<%=url([[admin]], [[services]], [[autoipsetadder]], [[getlog]])%>',
 	function(x, data) {
 		var lv = document.getElementById('cbid.logview.1.conf');
 		if (x.responseText && lv) {
-			lv.innerHTML += x.responseText; 
+			if (islogreverse){
+				lv.innerHTML = x.responseText.split('\n').reverse().join('\n')+lv.innerHTML;
+			}else{
+				lv.innerHTML += x.responseText;
+			}
 		}
 	}
 );}
 poll_check();
-<%end%>
+
 //]]>
 </script>
-		
+<%end%>		
 <%+cbi/valuefooter%>

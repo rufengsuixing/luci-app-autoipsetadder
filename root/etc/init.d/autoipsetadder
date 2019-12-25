@@ -6,6 +6,9 @@ START=99
 STOP=01
 CRON_FILE=/etc/crontabs/root
 CONFIGURATION=autoipsetadder
+EXTRA_COMMANDS="test_crontab"
+EXTRA_HELP="
+		test_crontab"
 set_dnsmasq_log()
 {
 	sed -i '/log-facility/d' /etc/dnsmasq.conf
@@ -66,7 +69,8 @@ do_crontab(){
 	config_get_bool enabled $CONFIGURATION enabled 0
 	config_get logfile $CONFIGURATION logfile "/tmp/addlist.log"
 	config_get dnslogfile $CONFIGURATION dnslogfile "/tmp/dnsmasq.log"
-	
+	config_get crontab $CONFIGURATION crontab ""
+	cronreload=0
 	findstr="echo qingkong > $dnslogfile"
 	default="0 * * * * echo qingkong > $dnslogfile"
 	[ -n "$lastdnslogfile" ] && findstr="echo qingkong > $lastdnslogfile" && [ "$lastdnslogfile" != "$dnslogfile" ] && replace="${lastdnslogfile//\//\\/}/${dnslogfile//\//\\/}"
@@ -111,4 +115,8 @@ crontab_editor(){
 			echo "$line" >> $CRON_FILE
 		fi
 	fi
+}
+test_crontab(){
+config_load "${CONFIGURATION}"
+do_crontab
 }
