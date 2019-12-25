@@ -3,12 +3,12 @@
 <%nixio=require"nixio"%>
 
 <%if uci:get("autoipsetadder","autoipsetadder","enabled") then%>
-<textarea id="cbid.logview.1.conf" class="cbi-input-textarea" style="width: 100%;display:inline" data-update="change" name="vbid.logview.1.conf" rows="5" cols="60" readonly="readonly" > </textarea>
+<textarea id="cbid.logview.1.conf" class="cbi-input-textarea" style="width: 100%;display:inline" data-update="change" name="vbid.logview.1.conf" rows="10" cols="60" readonly="readonly" > </textarea>
 <input class="cbi-button cbi-button-apply" name="apply_update_button" id="apply_update_button" value="dellog" onclick=" return apply_del_log() "/>
 
 <input class="cbi-button cbi-button-apply" name="apply_update_button" id="apply_update_button" value="debug" onclick=" return debug_ip() "/>
 
-<textarea id="cbid.logview.2.conf" class="cbi-input-textarea" style="width: 100%;display:none" data-update="change" name="vbid.logview.1.conf" rows="5" cols="60" readonly="readonly" > </textarea>
+<textarea id="cbid.logview.2.conf" class="cbi-input-textarea" style="width: 100%;display:none" data-update="change" name="vbid.logview.1.conf" rows="10" cols="60" readonly="readonly" > </textarea>
 
 <script type="text/javascript">//<![CDATA[
 function apply_del_log(){
@@ -34,16 +34,6 @@ XHR.poll(3, '<%=url([[admin]], [[services]], [[autoipsetadder]], [[getlog]])%>',
 	function(x, data) {
 		var lv = document.getElementById('cbid.logview.1.conf');
 		if (x.responseText && lv) {
-			if (x.responseText=="\u0000")
-			{
-				for(j = 0,len=this.XHR._q.length; j < len; j++) {
-				if (this.XHR._q[j].url == '<%=url([[admin]], [[services]], [[autoipsetadder]], [[getlog]])%>')
-				{
-				this.XHR._q.splice(j,1);
-				}
-				}
-				return	
-			}
 			lv.innerHTML += x.responseText; 
 		}
 	}
