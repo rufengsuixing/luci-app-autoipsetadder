@@ -4,7 +4,7 @@ USE_PROCD=1
  
 START=99
 STOP=01
-
+CRON_FILE=/etc/crontabs/root
 CONFIGURATION=autoipsetadder
 set_dnsmasq_log()
 {
@@ -46,7 +46,7 @@ start_service() {
 		procd_set_param command sh /usr/bin/autoipsetadder/autoaddlist.sh
 		procd_close_instance
 		echo "autoipsetadder turn on"
-		echo "enabled="$enabled""
+		echo "enabled=$enabled"
 	else
 		stop_dnsmasq_log
 		echo "autoipsetadder turn off"
