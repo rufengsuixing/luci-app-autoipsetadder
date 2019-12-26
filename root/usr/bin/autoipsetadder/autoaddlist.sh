@@ -55,17 +55,18 @@ if (passdomain==domain)
     a[ip]=domain;
     next;
 }
-a[ip]=domain;
 "ipset test china "ip" 2>&1"| getline ipset;
 close("ipset test china "ip" 2>&1");
 if (index(ipset,"Warning")!=0){
 	print("china "ip" pass");
+	a[ip]=domain;
 	next;
 }
 "ipset test gfwlist "ip" 2>&1"| getline ipset;
 close("ipset test gfwlist "ip" 2>&1");
 if (index(ipset,"Warning")!=0){
 	print("gfwlist "ip" pass");
+	a[ip]=domain;
 	next;
     }
 
