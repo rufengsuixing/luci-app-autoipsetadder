@@ -19,7 +19,8 @@ function act_status()
   luci.http.write_json(e)
 end
 function do_del_log()
-nixio.fs.writefile("/tmp/addlist.log","")
+local logfile=uci:get("autoipsetadder","autoipsetadder","logfile") or "/tmp/addlist.log"
+nixio.fs.writefile(logfile,"")
 luci.http.prepare_content("application/json")
 luci.http.write('')
 end
