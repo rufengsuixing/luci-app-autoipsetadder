@@ -47,6 +47,8 @@ define Package/luci-app-autoipsetadder/postinst
 #!/bin/sh
 	/etc/init.d/autoipsetadder enable >/dev/null 2>&1
 	/etc/init.d/autoipsetadder start
+	rm -f /tmp/luci-indexcache
+	rm -f /tmp/luci-modulecache/*
 exit 0
 endef
 
