@@ -4,8 +4,10 @@ logfile=$(uci get autoipsetadder.autoipsetadder.logfile)
 [ -z "$logfile" ] && logfile="/tmp/addlist.log"
 dnslogfile=$(uci get autoipsetadder.autoipsetadder.dnslogfile)
 [ -z "$logfile" ] && dnslogfile="/tmp/dnsmasq.log"
-
-stdbuf -oL tail -F $dnslogfile | awk  -F "[, ]+" '/reply/{
+config=$(uci get autoipsetadder.autoipsetadder.config 2>/dev/null)
+[ "${config//nochina/}" == "$config" ] && nochina="0"
+[ "${config//packetpass/}" == "$config" ] && packetpass="0"
+stdbuf -oL tail -F $dnslogfile | awk -v nochina="$nochina" -v packetpass="$packetpass" -F "[, ]+" '/reply/{
 ip=$8;
 if (ip=="" || ip=="127.0.0.1"|| ip=="0.0.0.0")
 {
@@ -55,13 +57,14 @@ if (passdomain==domain)
     a[ip]=domain;
     next;
 }
+if (nochina==1){
 "ipset test china "ip" 2>&1"| getline ipset;
 close("ipset test china "ip" 2>&1");
 if (index(ipset,"Warning")!=0){
 	print("china "ip" pass");
 	a[ip]=domain;
 	next;
-}
+}}
 "ipset test gfwlist "ip" 2>&1"| getline ipset;
 close("ipset test gfwlist "ip" 2>&1");
 if (index(ipset,"Warning")!=0){
@@ -81,7 +84,7 @@ if (testall==0){
         split(ret, b," +");
         split(b[11], pagnum,"=");
         #包数>12的放过
-        if (pagnum[2]>12)
+        if (packetpass==1 && pagnum[2]>12)
         {
             print("pass by packets="pagnum[2]" "ip" "domain);
             for (ipindex in ipcache)

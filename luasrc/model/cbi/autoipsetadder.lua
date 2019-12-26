@@ -4,7 +4,7 @@ local fs=require"nixio.fs"
 local uci=require"luci.model.uci".cursor()
 local m,s,o
 m = Map("autoipsetadder", translate("ipsetautoadder"))
-m.description = translate("自动将国外联不通的域名加入ipset")
+m.description = translate("自动将联不通的域名加入ipset")
 m:section(SimpleSection).template  = "autoipsetadder/status"
 
 s = m:section(TypedSection, "autoipsetadder")
@@ -61,7 +61,15 @@ o:value("autodeldnslog",translate("Auto del dnsmasq log"))
 o:value("autotaillog",translate("Auto tail runtime log"))
 o.widget = "checkbox"
 o.default = "autodeldnslog autotaillog"
-o.optional=true
+o.rmempty= true
+
+o = s:option(MultiValue, "config", translate("the way add to gfwlist"))
+o:value("nochina",translate("no china ip"))
+o:value("pingadd",translate("5ping loss1-4"))
+o:value("packetpass",translate("packet >12 pass"))
+o.widget = "checkbox"
+o.default = "nochina pingadd packetpass"
+o.rmempty=true
 ---- apply
 nixio.fs.writefile("/var/run/lucilogpos_ipset","0")
 function m.on_commit(map)

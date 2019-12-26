@@ -1,5 +1,7 @@
 #!/bin/sh
-echo $* | awk '{
+config=$(uci get autoipsetadder.autoipsetadder.config 2>/dev/null)
+[ "${config//pingadd/}" == "$config" ] && pingadd="0"
+echo $* | awk -v pingadd="$pingadd" '{
 if ($4=="")
 { 
 wait=0;
@@ -81,11 +83,8 @@ if (addlist!=1)
         }else{
             addlist=-1;}
     }
-    if (addlist==-1)
+    if (addlist==-1 && pingadd==1)
     {
-        "ipset test china "$1" 2>&1"| getline ipset;
-        close("ipset test china "$1" 2>&1");
-        if (index(ipset,"Warning")==0){
         while (("ping -c 5 -q -A "$1 | getline ret) > 0)
         {
             if (index(ret,"packet loss")!=0)
@@ -101,7 +100,6 @@ if (addlist!=1)
             } 
         }
         close("ping -c 5 -q "$1);
-        }
     }
 }
 ERRNO="";
