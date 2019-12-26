@@ -1,7 +1,8 @@
 module("luci.controller.autoipsetadder",package.seeall)
-io     = require "io"
-fs=require"nixio.fs"
-sys=require"luci.sys"
+local io     = require "io"
+local fs=require"nixio.fs"
+local sys=require"luci.sys"
+local uci=require"luci.model.uci".cursor()
 function index()
 	entry({"admin","services","autoipsetadder"},firstchild(),_("autoipsetadder"),30).dependent=true
 	entry({"admin","services","autoipsetadder","autoipsetadder"},cbi("autoipsetadder"),_("Base Setting"),1)
@@ -24,7 +25,7 @@ luci.http.write('')
 end
 function do_debug_ip()
 luci.http.prepare_content("text/plain; charset=utf-8")
-a=sys.exec("/usr/bin/autoipsetadder/debugip.sh")
+local a=sys.exec("/usr/bin/autoipsetadder/debugip.sh")
 if (a=="") then
 a="noproblem"
 end

@@ -2,7 +2,7 @@ require("luci.sys")
 require("luci.util")
 local fs=require"nixio.fs"
 local uci=require"luci.model.uci".cursor()
-
+local m,s,o
 m = Map("autoipsetadder", translate("ipsetautoadder"))
 m.description = translate("自动将国外联不通的域名加入ipset")
 m:section(SimpleSection).template  = "autoipsetadder/status"
