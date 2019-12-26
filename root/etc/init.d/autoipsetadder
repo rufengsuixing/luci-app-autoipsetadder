@@ -30,6 +30,7 @@ stop_dnsmasq_log()
 
 reload_service()
 {
+	rm -f /var/run/AdGucitest 2>/dev/null
 	procd_kill $CONFIGURATION
 	start
 }

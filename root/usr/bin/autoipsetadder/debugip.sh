@@ -1,7 +1,14 @@
 #!/bin/sh
 PATH="/usr/sbin:/usr/bin:/sbin:/bin"
 dlchina=$1;
-ipset list gfwlist | awk -v dlchina="$dlchina" '{
+logfile=$(uci get autoipsetadder.autoipsetadder.logfile)
+[ -z "$logfile" ] && logfile="/tmp/addlist.log"
+
+dnslogfile=$(uci get autoipsetadder.autoipsetadder.dnslogfile)
+[ -z "$logfile" ] && dnslogfile="/tmp/dnsmasq.log"
+
+
+ipset list gfwlist | awk -v dlchina="$dlchina" -v dnslogfile="$dnslogfile" -v logfile="$logfile" '{
 if (index($0,".")==0)
 {
     next;
@@ -27,19 +34,19 @@ close("ipset test whitelist "$0" 2>&1");
         if (china==0)
         {
         print("warning white ip not china"$0);
-        ret=system("grep "$0" /tmp/nohup.out");
+        ret=system("grep "$0" "logfile);
         if (ret!=0)
         {
-            ret=system("grep "$0" /tmp/dnsmasq.log");
+            ret=system("grep "$0" "dnslogfile);
         }
         }
     }else if (china==1)
 	{
 		print("warning china ip not white"$0);
-		ret=system("grep "$0" /tmp/nohup.out")
+		ret=system("grep "$0" "logfile)
 		if (ret!=0)
 		{
-			ret=system("grep "$0" /tmp/dnsmasq.log");
+			ret=system("grep "$0" "dnslogfile);
 		}
 		if (dlchina)
 		{

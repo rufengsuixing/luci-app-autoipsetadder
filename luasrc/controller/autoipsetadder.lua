@@ -30,23 +30,15 @@ a="noproblem"
 end
 luci.http.write(a)
 end
-
 function get_log()
+	local logfile=uci:get("autoipsetadder","autoipsetadder","logfile") or "/tmp/addlist.log"
 	luci.http.prepare_content("text/plain; charset=utf-8")
-	logpos=nixio.fs.readfile("/var/run/lucilogpos_ipset")
-	if (logpos ~= nil) then
-	fdp=tonumber(logpos)
-	else
-	fdp=0
-	end
-	f=io.open("/tmp/addlist.log", "r+")
+	local fdp=tonumber(fs.readfile("/var/run/lucilogpos_ipset")) or 0
+	local f=io.open(logfile, "r+")
 	f:seek("set",fdp)
-	a=f:read(8192)
-	if (a==nil) then
-	a=""
-	end
+	local a=f:read(2048000) or ""
 	fdp=f:seek()
-	nixio.fs.writefile("/var/run/lucilogpos_ipset",tostring(fdp))
+	fs.writefile("/var/run/lucilogpos_ipset",tostring(fdp))
 	f:close()
 	luci.http.write(a)
 end

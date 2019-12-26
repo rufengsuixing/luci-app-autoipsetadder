@@ -2,7 +2,10 @@
 PATH="/usr/sbin:/usr/bin:/sbin:/bin"
 logfile=$(uci get autoipsetadder.autoipsetadder.logfile)
 [ -z "$logfile" ] && logfile="/tmp/addlist.log"
-stdbuf -oL tail -F /tmp/dnsmasq.log | awk  -F "[, ]+" '/reply/{
+dnslogfile=$(uci get autoipsetadder.autoipsetadder.dnslogfile)
+[ -z "$logfile" ] && dnslogfile="/tmp/dnsmasq.log"
+
+stdbuf -oL tail -F $dnslogfile | awk  -F "[, ]+" '/reply/{
 ip=$8;
 if (ip=="" || ip=="127.0.0.1"|| ip=="0.0.0.0")
 {
