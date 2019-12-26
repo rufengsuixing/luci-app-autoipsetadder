@@ -1,6 +1,6 @@
 #!/bin/sh
 config=$(uci get autoipsetadder.autoipsetadder.config 2>/dev/null)
-[ "${config//pingadd/}" == "$config" ] && pingadd="0"
+[ "${config//pingadd/}" == "$config" ] && pingadd="0" || pingadd="1"
 echo $* | awk -v pingadd="$pingadd" '{
 if ($4=="")
 { 
