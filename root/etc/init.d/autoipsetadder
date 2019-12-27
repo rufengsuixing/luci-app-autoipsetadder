@@ -32,6 +32,7 @@ reload_service()
 {
 	rm -f /var/run/AdGucitest 2>/dev/null
 	procd_kill $CONFIGURATION
+	kill $(cat /var/run/autoipsetadder.pid)
 	start
 }
 
@@ -63,6 +64,7 @@ stop_service()
 	config_load "${CONFIGURATION}"
 	stop_dnsmasq_log
 	do_crontab
+	kill $(cat /var/run/autoipsetadder.pid)
 	echo "autoipsetadder turn off"
 	echo "enabled="$enabled""
 }
