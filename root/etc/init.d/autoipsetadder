@@ -81,9 +81,9 @@ do_crontab(){
 	crontab_editor
 	[ "$lastdnslogfile" != "$dnslogfile" ] && uci set autoipsetadder.autoipsetadder.lastdnslogfile="$dnslogfile" && commit=1
 	
-	findstr="tail -n 2000 $logfile > $logfile"
-	default="0 0 * * * tail -n 2000 $logfile > $logfile"
-	[ -n "$lastlogfile" ] && findstr="tail -n 2000 $lastlogfile > $lastlogfile" && [ "$lastlogfile" != "$logfile" ] && replace="${lastlogfile//\//\\/}/${logfile//\//\\/}"
+	findstr="/usr/bin/autoipsetadder/tailto.sh [0-9]* $logfile"
+	default="0 0 * * * /usr/bin/autoipsetadder/tailto.sh 2000 $logfile"
+	[ -n "$lastlogfile" ] && findstr="/usr/bin/autoipsetadder/tailto.sh [0-9]* $lastlogfile" && [ "$lastlogfile" != "$logfile" ] && replace="${lastlogfile//\//\\/}/${logfile//\//\\/}"
 	[ "$enabled" == "0" ] || [ "${crontab//autotaillog/}" == "$crontab" ] && cronenable=0 || cronenable=1
 	crontab_editor
 	[ -n "$logfile" ] && [ "$lastlogfile" != "$logfile" ] && uci set autoipsetadder.autoipsetadder.lastlogfile="$logfile" && commit=1
