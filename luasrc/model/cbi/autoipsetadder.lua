@@ -72,26 +72,4 @@ o.default = "nochina pingadd packetpass"
 o.rmempty=true
 ---- apply
 nixio.fs.writefile("/var/run/lucilogpos_ipset","0")
-function m.on_commit(map)
-	local ucitracktest=uci:get("autoipsetadder","autoipsetadder","ucitracktest")
-	if ucitracktest=="1" then
-		return
-	elseif ucitracktest=="0" then
-		io.popen("/etc/init.d/autoipsetadder reload &")
-	else
-		if (fs.access("/var/run/AdGucitest")) then
-			uci:set("autoipsetadder","autoipsetadder","ucitracktest","0")
-			io.popen("/etc/init.d/autoipsetadder reload &")
-		else
-			fs.writefile("/var/run/AdGucitest","")
-			if (ucitracktest=="2") then
-				uci:set("autoipsetadder","autoipsetadder","ucitracktest","1")
-			else
-				uci:set("autoipsetadder","autoipsetadder","ucitracktest","2")
-			end
-		end
-		uci:save("autoipsetadder")
-		uci:commit("autoipsetadder")
-	end
-end
 return m
