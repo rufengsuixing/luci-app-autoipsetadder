@@ -35,6 +35,10 @@ end
 function get_log()
 	local logfile=uci:get("autoipsetadder","autoipsetadder","logfile") or "/tmp/addlist.log"
 	luci.http.prepare_content("text/plain; charset=utf-8")
+	if fs.access(logfile) then
+		luci.http.write("")
+		return
+	end
 	local fdp=tonumber(fs.readfile("/var/run/lucilogpos_ipset")) or 0
 	local f=io.open(logfile, "r+")
 	f:seek("set",fdp)
