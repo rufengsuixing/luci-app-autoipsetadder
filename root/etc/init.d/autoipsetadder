@@ -35,7 +35,9 @@ reload_service()
 	kill $(cat /var/run/autoipsetadder.pid)
 	start
 }
-
+service_triggers() {
+	procd_add_reload_trigger "$CONFIGURATION"
+}
 start_service() {
 	# Reading config
 	config_load "${CONFIGURATION}"
